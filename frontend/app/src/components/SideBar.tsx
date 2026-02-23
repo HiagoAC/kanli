@@ -1,5 +1,6 @@
 import { Box, Divider, Link, Typography } from "@mui/material";
 import { Link as RouterLink } from "react-router-dom";
+import logo from "../assets/kanli_logo.png";
 import { SideBarBoardList } from "../features/board/components/SideBarBoardList";
 import { SideBarButtonList } from "./SideBarButtonList";
 
@@ -15,9 +16,24 @@ export function SideBar() {
 			}}
 		>
 			<Link component={RouterLink} to="/" underline="none" color="inherit">
-				<Typography variant="h6" fontWeight="bold" sx={{ m: 2 }}>
-					KANBAN
-				</Typography>
+				<Box
+					sx={{
+						display: "flex",
+						alignItems: "center",
+						gap: 1,
+						m: 2,
+					}}
+				>
+					<Box
+						component="img"
+						src={logo}
+						alt="Kanli Logo"
+						sx={{ width: "40px", height: "40px" }}
+					/>
+					<Typography variant="h4" fontWeight="bold">
+						Kanli
+					</Typography>
+				</Box>
 			</Link>
 			<SideBarButtonList />
 			<Divider />
