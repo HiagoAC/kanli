@@ -269,6 +269,21 @@ class PrivateBoardsApiTests(TestCase):
         self.assertEqual(column1.order, column1_order)
         self.assertEqual(column2.order, column2_order)
 
+    def test_move_column_before_not_found(self):
+        """
+        Test that moving a non-existent column before another returns 404.
+        """
+        board = Board.objects.create(user=self.user, title='A Board')
+        non_existent_id = '00000000-0000-0000-0000-000000000000'
+        url = column_move_before_url(str(board.id), non_existent_id)
+        payload = {'target_column_id': non_existent_id}
+        res = self.client.post(
+            url,
+            json.dumps(payload),
+            content_type='application/json'
+        )
+        self.assertEqual(res.status_code, 404)
+
     def test_move_column_to_end(self):
         """Test moving a column to the end of its board."""
         board = Board.objects.create(user=self.user, title='A Board')
@@ -286,3 +301,11 @@ class PrivateBoardsApiTests(TestCase):
         column3.refresh_from_db()
         self.assertGreater(column1.order, column2.order)
         self.assertGreater(column1.order, column3.order)
+
+    def test_move_column_to_end_not_found(self):
+        """Test that moving a non-existent column to end returns 404."""
+        board = Board.objects.create(user=self.user, title='A Board')
+        non_existent_id = '00000000-0000-0000-0000-000000000000'
+        url = column_move_end_url(str(board.id), non_existent_id)
+        res = self.client.post(url, content_type='application/json')
+        self.assertEqual(res.status_code, 404)
