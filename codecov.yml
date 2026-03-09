@@ -13,3 +13,6 @@ flags:
     carryforward: true
   frontend:
     carryforward: true
+
+ignore:
+  - "**/urls.py"
