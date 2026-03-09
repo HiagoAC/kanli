@@ -166,6 +166,26 @@ class PrivateCardsApiTests(TestCase):
         self.assertNotEqual(card.created_at.isoformat(), payload['created_at'])
         self.assertNotEqual(card.updated_at.isoformat(), payload['updated_at'])
 
+    def test_update_card_not_found(self):
+        """Test that updating a card not owned by the user returns 404."""
+        another_user = User.objects.create_user('anotheruser@example.com')
+        another_board = Board.objects.create(
+            title='Another Board', user=another_user)
+        another_column = Column.objects.create(
+            board=another_board, title='In Progress')
+        card = Card.objects.create(
+            title='Another Card', body='Another Body', column=another_column)
+        url = card_detail_url(card.id)
+        payload = {'title': 'Should Not Update'}
+        res = self.client.patch(
+            url,
+            json.dumps(payload),
+            content_type='application/json'
+        )
+        self.assertEqual(res.status_code, 404)
+        card.refresh_from_db()
+        self.assertEqual(card.title, 'Another Card')
+
     def test_delete_card(self):
         """Test deleting a card."""
         card = Card.objects.create(
@@ -174,6 +194,20 @@ class PrivateCardsApiTests(TestCase):
         res = self.client.delete(url)
         self.assertEqual(res.status_code, 204)
         self.assertFalse(Card.objects.filter(id=card.id).exists())
+
+    def test_delete_card_not_found(self):
+        """Test that deleting a card not owned by the user returns 404."""
+        another_user = User.objects.create_user('anotheruser@example.com')
+        another_board = Board.objects.create(
+            title='Another Board', user=another_user)
+        another_column = Column.objects.create(
+            board=another_board, title='In Progress')
+        card = Card.objects.create(
+            title='Another Card', body='Another Body', column=another_column)
+        url = card_detail_url(card.id)
+        res = self.client.delete(url)
+        self.assertEqual(res.status_code, 404)
+        self.assertTrue(Card.objects.filter(id=card.id).exists())
 
     def test_move_card_above(self):
         """Test moving a card above another card."""
@@ -214,6 +248,25 @@ class PrivateCardsApiTests(TestCase):
         self.assertEqual(card1.order, card1_order)
         self.assertEqual(card2.order, card2_order)
 
+    def test_move_card_above_not_found(self):
+        """Test that moving a non-existent card above another returns 404."""
+        another_user = User.objects.create_user('anotheruser@example.com')
+        another_board = Board.objects.create(
+            title='Another Board', user=another_user)
+        another_column = Column.objects.create(
+            board=another_board, title='In Progress')
+        card1 = Card.objects.create(title='Card 1', column=self.column)
+        card2 = Card.objects.create(
+            title='Card 2', column=another_column)
+        url = card_move_above_url(card2.id)
+        payload = {'target_card_id': str(card1.id)}
+        res = self.client.post(
+            url,
+            json.dumps(payload),
+            content_type='application/json'
+        )
+        self.assertEqual(res.status_code, 404)
+
     def test_move_card_to_bottom(self):
         """Test moving a card to the bottom of its column."""
         card1 = Card.objects.create(title='Card 1', column=self.column)
@@ -230,3 +283,16 @@ class PrivateCardsApiTests(TestCase):
         card3.refresh_from_db()
         self.assertGreater(card1.order, card2.order)
         self.assertGreater(card1.order, card3.order)
+
+    def test_move_card_to_bottom_not_found(self):
+        """Test that moving a non-existent card to bottom returns 404."""
+        another_user = User.objects.create_user('anotheruser@example.com')
+        another_board = Board.objects.create(
+            title='Another Board', user=another_user)
+        another_column = Column.objects.create(
+            board=another_board, title='In Progress')
+        card = Card.objects.create(
+            title='Another Card', column=another_column)
+        url = card_move_bottom_url(card.id)
+        res = self.client.post(url, content_type='application/json')
+        self.assertEqual(res.status_code, 404)
