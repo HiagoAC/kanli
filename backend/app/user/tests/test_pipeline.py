@@ -1,6 +1,6 @@
 from django.test import TestCase
 from django.contrib.auth import get_user_model
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 from board.models import Board
 from user.pipeline import (
     create_default_board_pipeline,
@@ -137,6 +137,22 @@ class HandleGuestUserTests(TestCase):
 
         self.assertTrue(User.objects.filter(
             id=str(self.guest_user.id)).exists())
+
+    def test_handle_guest_user_no_guest_user_id(self):
+        """
+        Test that nothing happens when guest_user_id is absent from session.
+        """
+        self.strategy.request.session = {
+            'guest_migration_action': 'merge'
+        }
+
+        with patch('user.pipeline.merge_guest_user') as mock_merge:
+            handle_guest_user(
+                strategy=self.strategy,
+                backend=self.backend,
+                user=self.registered_user
+            )
+            self.assertFalse(mock_merge.called)
 
     def test_handle_guest_user_non_guest_user(self):
         """Test that nothing happens when user is not a guest user."""
