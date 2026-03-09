@@ -46,3 +46,23 @@ class CleanupGuestsCommandTests(TestCase):
             timedelta(hours=self.grace_period)
         )
         self.assertEqual(kwargs["dry_run"], self.dry_run)
+
+    @patch('user.management.commands.cleanup_guests.cleanup_stale_guests')
+    @patch('user.management.commands.cleanup_guests.cleanup_unused_guests')
+    def test_handle_outputs_success_without_dry_run(
+            self, mock_cleanup_unused, mock_cleanup_stale):
+        """Test that a non-dry-run execution writes a SUCCESS message."""
+        mock_cleanup_stale.return_value = 5
+        mock_cleanup_unused.return_value = 2
+
+        call_command(
+            'cleanup_guests',
+            '--inactive-days', str(self.inactive_days),
+            '--grace-period-new-accounts', str(self.grace_period),
+            stdout=self.out
+        )
+
+        output = self.out.getvalue()
+        self.assertIn(
+            'Deleted 5 stale guests and 2 unused new accounts', output)
+        self.assertNotIn('[DRY RUN]', output)
