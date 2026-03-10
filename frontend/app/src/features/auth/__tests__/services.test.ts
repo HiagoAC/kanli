@@ -1,6 +1,7 @@
 // @vitest-environment jsdom
 
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import type { Mock } from "vitest";
 import apiClient, { BASE_URL } from "../../../services/apiClient";
 import * as authServices from "../services";
 
@@ -13,10 +14,10 @@ vi.mock("../../../services/apiClient", () => ({
 }));
 
 describe("signInWithGoogle", () => {
-	let assignMock: ReturnType<typeof vi.fn>;
+	let assignMock: Mock;
 	let originalLocation: Location;
-	let mockApiPost: ReturnType<typeof vi.fn>;
-	let mockApiGet: ReturnType<typeof vi.fn>;
+	let mockApiPost: Mock;
+	let mockApiGet: Mock;
 
 	beforeEach(() => {
 		assignMock = vi.fn();
@@ -116,5 +117,25 @@ describe("signInWithGoogle", () => {
 		expect(assignMock).toHaveBeenCalledOnce();
 
 		consoleSpy.mockRestore();
+	});
+});
+
+describe("logout", () => {
+	let mockApiPost: Mock;
+
+	beforeEach(() => {
+		mockApiPost = vi.mocked(apiClient.post);
+		mockApiPost.mockResolvedValue({});
+	});
+
+	afterEach(() => {
+		vi.clearAllMocks();
+	});
+
+	it("should call apiClient.post with logout URL", async () => {
+		await authServices.logout();
+
+		expect(mockApiPost).toHaveBeenCalledOnce();
+		expect(mockApiPost).toHaveBeenCalledWith("logout/");
 	});
 });
