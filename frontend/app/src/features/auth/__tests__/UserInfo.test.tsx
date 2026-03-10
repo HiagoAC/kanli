@@ -25,4 +25,20 @@ describe("UserInfo", () => {
 
 		expect(refreshUser).toHaveBeenCalledTimes(1);
 	});
+
+	it("renders initials when avatarUrl is undefined", () => {
+		const user = {
+			id: "1",
+			username: "johndoe",
+			firstName: "John",
+			lastName: "Doe",
+			email: "john@example.com",
+			avatarUrl: undefined,
+			isGuest: false,
+		};
+
+		render(<UserInfo user={user} />);
+
+		expect(screen.getByText("JD")).not.toBeNull();
+	});
 });
