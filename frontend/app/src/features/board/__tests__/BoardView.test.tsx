@@ -128,7 +128,10 @@ describe("BoardView", () => {
 		renderBoard(board([column("col-1", "To Do"), column("col-2", "Done")]));
 
 		await act(async () => {
-			capturedOnDragEnd?.({ active: { id: "col-1" }, over: { id: "col-2" } } as DragEndEvent);
+			capturedOnDragEnd?.({
+				active: { id: "col-1" },
+				over: { id: "col-2" },
+			} as DragEndEvent);
 		});
 
 		expect(executeDragMove).toHaveBeenCalled();
@@ -142,7 +145,10 @@ describe("BoardView", () => {
 		renderBoard(board([column("col-1", "To Do"), column("col-2", "Done")]));
 
 		await act(async () => {
-			capturedOnDragEnd?.({ active: { id: "col-1" }, over: { id: "col-2" } } as DragEndEvent);
+			capturedOnDragEnd?.({
+				active: { id: "col-1" },
+				over: { id: "col-2" },
+			} as DragEndEvent);
 		});
 
 		expect(executeDragMove).toHaveBeenCalled();
@@ -151,9 +157,9 @@ describe("BoardView", () => {
 
 	describe("handleDragEnd callbacks with executeDragMove", () => {
 		beforeEach(async () => {
-			const actual = await vi.importActual<typeof import("../../../utils/drag-and-drop")>(
-				"../../../utils/drag-and-drop",
-			);
+			const actual = await vi.importActual<
+				typeof import("../../../utils/drag-and-drop")
+			>("../../../utils/drag-and-drop");
 			vi.mocked(executeDragMove).mockImplementation(actual.executeDragMove);
 			vi.mocked(updateItemsOrder).mockImplementation(actual.updateItemsOrder);
 		});
@@ -169,7 +175,10 @@ describe("BoardView", () => {
 			);
 
 			await act(async () => {
-				capturedOnDragEnd?.({ active: { id: "col-3" }, over: { id: "col-1" } } as DragEndEvent);
+				capturedOnDragEnd?.({
+					active: { id: "col-3" },
+					over: { id: "col-1" },
+				} as DragEndEvent);
 			});
 
 			expect(mockMoveColumnBefore).toHaveBeenCalledWith({
@@ -182,15 +191,13 @@ describe("BoardView", () => {
 
 		it("calls moveColumnEnd when dragging a column to the last position (moveItemBottom)", async () => {
 			// col-1 (index 0) dragged over col-2 (index 1, last) → overIndex===length-1 → moveItemBottom
-			renderBoard(
-				board([
-					column("col-1", "To Do"),
-					column("col-2", "Done"),
-				]),
-			);
+			renderBoard(board([column("col-1", "To Do"), column("col-2", "Done")]));
 
 			await act(async () => {
-				capturedOnDragEnd?.({ active: { id: "col-1" }, over: { id: "col-2" } } as DragEndEvent);
+				capturedOnDragEnd?.({
+					active: { id: "col-1" },
+					over: { id: "col-2" },
+				} as DragEndEvent);
 			});
 
 			expect(mockMoveColumnEnd).toHaveBeenCalledWith({

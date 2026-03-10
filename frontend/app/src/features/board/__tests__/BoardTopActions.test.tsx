@@ -12,9 +12,7 @@ vi.mock("../components/BoardOptionsMenu", () => ({
 	BoardOptionsMenu: () => <div data-testid="board-options-menu" />,
 }));
 vi.mock("react-timeago", () => ({
-	default: ({ date }: { date: Date }) => (
-		<span>{date.toISOString()}</span>
-	),
+	default: ({ date }: { date: Date }) => <span>{date.toISOString()}</span>,
 }));
 
 const mockMutate = vi.fn();
@@ -50,7 +48,9 @@ describe("BoardTopActions", () => {
 		render(<BoardTopActions board={makeBoard(false)} />);
 
 		// StarOutlineIcon renders an svg; StarIcon does not appear
-		expect(document.querySelector('[data-testid="StarOutlineIcon"]')).not.toBeNull();
+		expect(
+			document.querySelector('[data-testid="StarOutlineIcon"]'),
+		).not.toBeNull();
 		expect(document.querySelector('[data-testid="StarIcon"]')).toBeNull();
 	});
 
@@ -58,7 +58,9 @@ describe("BoardTopActions", () => {
 		render(<BoardTopActions board={makeBoard(true)} />);
 
 		expect(document.querySelector('[data-testid="StarIcon"]')).not.toBeNull();
-		expect(document.querySelector('[data-testid="StarOutlineIcon"]')).toBeNull();
+		expect(
+			document.querySelector('[data-testid="StarOutlineIcon"]'),
+		).toBeNull();
 	});
 
 	it("calls updateBoard with starred toggled to true when clicking star button on unstarred board", async () => {

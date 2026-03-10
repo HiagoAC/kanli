@@ -9,16 +9,30 @@ import type { Board, Column } from "../types";
 let capturedOnCardCountChange: (n: number) => void = () => {};
 
 vi.mock("../../card/components/CardStack", () => ({
-	CardStack: ({ onCardCountChange }: { onCardCountChange: (n: number) => void; columnId: string }) => {
+	CardStack: ({
+		onCardCountChange,
+	}: {
+		onCardCountChange: (n: number) => void;
+		columnId: string;
+	}) => {
 		capturedOnCardCountChange = onCardCountChange;
 		return <div />;
 	},
 }));
 
 vi.mock("../../card/components/CreateCardDialogue", () => ({
-	CreateCardDialogue: ({ onClose }: { open: boolean; onClose: () => void; column: Column; board: Board }) => (
+	CreateCardDialogue: ({
+		onClose,
+	}: {
+		open: boolean;
+		onClose: () => void;
+		column: Column;
+		board: Board;
+	}) => (
 		<div data-testid="create-card-dialogue">
-			<button type="button" onClick={onClose}>close</button>
+			<button type="button" onClick={onClose}>
+				close
+			</button>
 		</div>
 	),
 }));
@@ -28,9 +42,19 @@ vi.mock("../components/ColumnOptionsMenu", () => ({
 }));
 
 const column: Column = { id: "c1", title: "Todo" };
-const board: Board = { id: "b1", title: "B", starred: false, columns: [column], createdAt: new Date(), updatedAt: new Date() };
+const board: Board = {
+	id: "b1",
+	title: "B",
+	starred: false,
+	columns: [column],
+	createdAt: new Date(),
+	updatedAt: new Date(),
+};
 const setup = () => render(<ColumnView column={column} board={board} />);
-const addButton = () => document.querySelector('[data-testid="AddIcon"]')!.closest("button") as HTMLElement;
+const addButton = () =>
+	document
+		.querySelector('[data-testid="AddIcon"]')
+		?.closest("button") as HTMLElement;
 
 describe("ColumnView", () => {
 	afterEach(cleanup);
@@ -53,7 +77,9 @@ describe("ColumnView", () => {
 
 	it("updates card count when CardStack calls onCardCountChange", async () => {
 		setup();
-		await act(async () => { capturedOnCardCountChange(5); });
+		await act(async () => {
+			capturedOnCardCountChange(5);
+		});
 		expect(screen.getByText("5")).not.toBeNull();
 	});
 });
