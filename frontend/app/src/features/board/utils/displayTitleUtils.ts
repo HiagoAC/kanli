@@ -1,5 +1,10 @@
 import type { BoardListItem } from "../types";
 
+/**
+ * Maps each board ID to a unique display title.
+ * Boards sharing a title are disambiguated by appending a numeric suffix,
+ * sorted by creation date (e.g. "My Board", "My Board (1)").
+ */
 export function generateDisplayTitles(
 	boards: BoardListItem[],
 ): Map<string, string> {
